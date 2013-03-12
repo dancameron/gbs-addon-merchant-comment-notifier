@@ -28,7 +28,7 @@ class GBS_Comment_Notifications extends Group_Buying_Notifications {
 		$notifications[self::NOTIFICATION_TYPE_REPLY] = array(
 			'name' => self::__( 'Comment Reply Notification to User' ),
 			'description' => self::__( "Customize the notification sent to the user whom just received a reply from the merchant." ),
-			'shortcodes' => array( 'date', 'comment', 'comment_author', 'deal_url', 'deal_title' ),
+			'shortcodes' => array( 'date', 'comment', 'comment_reply', 'comment_author', 'deal_url', 'deal_title' ),
 			'default_title' => self::__( 'New Comment Reply at ' . get_bloginfo( 'name' ) ),
 			'default_content' => sprintf( 'An important reply was made to your comment at %s.', get_bloginfo( 'name' ) ),
 			'allow_preference' => TRUE
@@ -41,6 +41,10 @@ class GBS_Comment_Notifications extends Group_Buying_Notifications {
 			'description' => self::__( 'Used to display the comment content.' ),
 			'callback' => array( get_class(), 'comment_shortcode' )
 		);
+		$default_shortcodes['comment_reply'] = array(
+			'description' => self::__( 'Used to display the content of the replied to comment.' ),
+			'callback' => array( get_class(), 'comment_reply_shortcode' )
+		);
 		$default_shortcodes['comment_author'] = array(
 			'description' => self::__( 'Used to display the comment author.' ),
 			'callback' => array( get_class(), 'comment_author_shortcode' )
@@ -50,6 +54,13 @@ class GBS_Comment_Notifications extends Group_Buying_Notifications {
 
 	public static function comment_shortcode( $atts, $content, $code, $data ) {
 		$comment_id = $data['comment_id'];
+		$comment = get_comment( $comment_id ); 
+		$content = $comment->comment_content;
+		return $content;
+	}
+
+	public static function comment_reply_shortcode( $atts, $content, $code, $data ) {
+		$comment_id = $data['comment_replied_to_id'];
 		$comment = get_comment( $comment_id ); 
 		$content = $comment->comment_content;
 		return $content;
