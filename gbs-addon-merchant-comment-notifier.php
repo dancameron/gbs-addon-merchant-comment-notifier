@@ -20,7 +20,7 @@ Text Domain: group-buying
  */
 if ( !function_exists('gbs_merchant_comment_notifications') ) { // play nice
 	function gbs_merchant_comment_notifications( $addons ) {
-		$addons['twmp_tools'] = array(
+		$addons['merchant_comment_notifications'] = array(
 			'label' => __( 'Comment Notifications' ),
 			'description' => __( 'Notify the merchant about new comments and send notifications to the commenter the merchant replies to.' ),
 			'files' => array(
@@ -38,14 +38,14 @@ if ( !function_exists('gbs_merchant_comment_notifications') ) { // play nice
 
 if ( !function_exists('gbs_merchant_purchase_notifications') ) { // play nice
 	function gbs_merchant_purchase_notifications( $addons ) {
-		$addons['twmp_tools'] = array(
+		$addons['merchant_purchase_notifications'] = array(
 			'label' => __( 'Purchase Notification to Merchant' ),
 			'description' => __( 'Notify the merchant about new purchases.' ),
 			'files' => array(
 				dirname(__FILE__).'/classes/merchantPurchaseNotifications.class.php'
 			),
 			'callbacks' => array(
-				array( 'GBS_Vouchers_Extension', 'init' )
+				array( 'GBS_Purchase_Notification', 'init' )
 			),
 		);
 		return $addons;

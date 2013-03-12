@@ -52,14 +52,14 @@ class GBS_Comment_Notifications extends Group_Buying_Notifications {
 		$comment_id = $data['comment_id'];
 		$comment = get_comment( $comment_id ); 
 		$content = $comment->comment_content;
-		return $content
+		return $content;
 	}
 
 	public static function comment_author_shortcode( $atts, $content, $code, $data ) {
 		$comment_id = $data['comment_id'];
 		$comment = get_comment( $comment_id ); 
 		$name = $comment->comment_author;
-		return $name
+		return $name;
 	}
 
 	function comment_notification( $comment_id ) {
