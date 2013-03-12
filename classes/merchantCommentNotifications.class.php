@@ -77,11 +77,13 @@ class GBS_Comment_Notifications extends Group_Buying_Notifications {
 		$comment = get_comment( $comment_id );
 		$post_id = $comment->comment_post_ID;
 
+
 		if ( get_post_type( $post_id ) != Group_Buying_Deal::POST_TYPE )
 			return;
 
 		$deal = Group_Buying_Deal::get_instance( $post_id );
 		$merchant_id = $deal->get_merchant_id();
+
 
 		// Don't continue if the deal doesn't have a merchant
 		if ( !$merchant_id )
@@ -91,9 +93,10 @@ class GBS_Comment_Notifications extends Group_Buying_Notifications {
 			self::maybe_send_merchant_notfication( $comment, $merchant_id, $deal );
 		}
 
+		$comment_parent = $comment->comment_parent;
 		// If a reply maybe send a notification
 		if ( $comment_parent ) {
-			self::maybe_send_merchant_notfication( $comment, $merchant_id, $deal );
+			self::maybe_send_reply_notfication( $comment, $merchant_id, $deal );
 		}
 	}
 
@@ -104,8 +107,8 @@ class GBS_Comment_Notifications extends Group_Buying_Notifications {
 
 		// Don't send a notification to the merchant whom made the comment
 		if ( !in_array( $commenter_id, $authorized_users ) ) {
-
 			foreach ( $authorized_users as $user_id ) {
+
 				$recipient = self::get_user_email( $user_id );
 				$data = array(
 					'user_id' => $user_id,
@@ -135,8 +138,8 @@ class GBS_Comment_Notifications extends Group_Buying_Notifications {
 			$data = array(
 				'user_id' => $parent_user_id,
 				'merchant_id' => $merchant_id,
+				'comment_id' => $comment->comment_ID,
 				'comment_replied_to_id' => $comment_parent,
-				'comment_reply_id' => $comment->comment_ID,
 				'deal' => $deal
 			);
 			self::send_notification( self::NOTIFICATION_TYPE_REPLY, $data, $recipient );
