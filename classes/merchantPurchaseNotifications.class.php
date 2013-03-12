@@ -11,7 +11,7 @@ class GBS_Purchase_Notification extends Group_Buying_Notifications {
 	private function add_hooks() {
 		
 		add_action( 'purchase_completed', array( get_class(), 'purchase_notification' ), 10, 1 );
-		
+
 		// Register Notifications
 		add_filter( 'gb_notification_types', array( get_class(), 'register_notification_type' ), 10, 1 );
 		add_filter( 'gb_notification_shortcodes', array( get_class(), 'register_notification_shortcodes' ), 10, 1 );
@@ -21,7 +21,7 @@ class GBS_Purchase_Notification extends Group_Buying_Notifications {
 		$notifications[self::NOTIFICATION_TYPE] = array(
 			'name' => self::__( 'Purchase Notification to Merchant' ),
 			'description' => self::__( "Customize the notification sent to the merchant after a purchase." ),
-			'shortcodes' => array( 'date', 'name', 'username', 'purchase_details_for_merchant', 'transid', 'site_title', 'site_url', 'billing_address', 'shipping_address' ),
+			'shortcodes' => array( 'date', 'name', 'username', 'purchase_details_for_merchant', 'transid', 'site_title', 'site_url', 'billing_address', 'shipping_address', 'purchaser_email' ),
 			'default_title' => self::__( 'New Purchase at ' . get_bloginfo( 'name' ) ),
 			'default_content' => sprintf( 'A purchase was just made at %s with a product that you manage.', get_bloginfo( 'name' ) ),
 			'allow_preference' => FALSE
@@ -34,6 +34,10 @@ class GBS_Purchase_Notification extends Group_Buying_Notifications {
 			'description' => self::__( 'Used to display the purchase information that relates to the merchant.' ),
 			'callback' => array( get_class(), 'purchase_details_for_merchant_shortcode' )
 		);
+		$default_shortcodes['purchaser_email'] = array(
+			'description' => self::__( 'Used to display the purchasers email. The email should not be provided to merchants without the customer explicitly allowing it, or if you have it in your TOS of the site.' ),
+			'callback' => array( get_class(), 'purchaser_email_shortcode' )
+		);
 		return $default_shortcodes;
 	}
 
@@ -43,12 +47,21 @@ class GBS_Purchase_Notification extends Group_Buying_Notifications {
 			$deal_id = (int) $product['deal_id'];
 			$deal = Group_Buying_Deal::get_instance( $deal_id );
 			$title = $deal->get_title( $product['data'] );
-			$url = get_permalink( $item_id );
+			$url = get_permalink( $deal_id );
 
-			$output .= self::__( 'Deal' ) . ": $title\n";
-			$output .= self::__( 'URL' ) . ": $url\n\n";
+			$output .= self::__( 'Deal: ' ) . ": $title\n";
+			$output .= self::__( 'URL: ' ) . ": $url\n\n";
 		}
 		return apply_filters( 'gb_shortcode_merchant_purchase_details', $output, $purchase, $products, $atts, $content, $code, $data );
+	}
+
+	public function purchaser_email_shortcode( $atts, $content, $code, $data ) {
+		$purchase = $data['purchase'];
+		$user_id = $purchase->get_user();
+		if ( $user_id == -1 ) { // purchase will be set to -1 if it's a gift.
+			$user_id = $purchase->get_original_user();
+		}
+		return self::get_user_email( $user_id );
 	}
 
 	function purchase_notification( $purchase ) {
