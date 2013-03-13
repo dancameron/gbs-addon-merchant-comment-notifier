@@ -108,8 +108,8 @@ class GBS_Comment_Notifications extends Group_Buying_Notifications {
 		// Don't send a notification to the merchant whom made the comment
 		if ( !in_array( $commenter_id, $authorized_users ) ) {
 			foreach ( $authorized_users as $user_id ) {
-
-				$recipient = self::get_user_email( $user_id );
+				$user = get_userdata( $user_id );
+				$recipient = self::get_user_email( $user );
 				$data = array(
 					'user_id' => $user_id,
 					'merchant_id' => $merchant_id,
@@ -132,8 +132,15 @@ class GBS_Comment_Notifications extends Group_Buying_Notifications {
 			$comment_parent = $comment->comment_parent;
 			$parent_comment = get_comment( $comment_parent );
 			$parent_user_id = $parent_comment->user_id;
+			
 			// Send notification to the replied to user
-			$recipient = self::get_user_email( $parent_user_id );
+			if ( !$parent_user_id ) { // If the commenter is not a user than use his/her entered info
+				$recipient = $parent_comment->comment_author . ' <'.$parent_comment->comment_author_email.'>';
+			} 
+			else { // Use the commenter's profile 
+				$user = get_userdata( $parent_user_id );
+				$recipient = self::get_user_email( $user );
+			}
 			// Setup data
 			$data = array(
 				'user_id' => $parent_user_id,
