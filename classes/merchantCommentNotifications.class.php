@@ -90,17 +90,17 @@ class GBS_Comment_Notifications extends Group_Buying_Notifications {
 			return;
 
 		if ( $merchant_id ) {
-			self::maybe_send_merchant_notfication( $comment, $merchant_id, $deal );
+			self::maybe_send_merchant_notification( $comment, $merchant_id, $deal );
 		}
 
 		$comment_parent = $comment->comment_parent;
 		// If a reply maybe send a notification
 		if ( $comment_parent ) {
-			self::maybe_send_reply_notfication( $comment, $merchant_id, $deal );
+			self::maybe_send_reply_notification( $comment, $merchant_id, $deal );
 		}
 	}
 
-	public function maybe_send_merchant_notfication( $comment, $merchant_id, Group_Buying_Deal $deal ) {
+	public function maybe_send_merchant_notification( $comment, $merchant_id, Group_Buying_Deal $deal ) {
 		$commenter_id = $comment->user_id;
 		$merchant = Group_Buying_Merchant::get_instance( $merchant_id );
 		$authorized_users = $merchant->get_authorized_users();
@@ -121,7 +121,7 @@ class GBS_Comment_Notifications extends Group_Buying_Notifications {
 		}
 	}
 
-	public function maybe_send_reply_notfication( $comment, $merchant_id, Group_Buying_Deal $deal ) {
+	public function maybe_send_reply_notification( $comment, $merchant_id, Group_Buying_Deal $deal ) {
 		$merchant = Group_Buying_Merchant::get_instance( $merchant_id );
 		$authorized_users = $merchant->get_authorized_users();
 		$commenter_id = $comment->user_id;
