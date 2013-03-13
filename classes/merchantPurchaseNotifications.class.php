@@ -81,7 +81,8 @@ class GBS_Purchase_Notification extends Group_Buying_Notifications {
 			$authorized_users = $merchant->get_authorized_users();
 
 			foreach ( $authorized_users as $user_id ) {
-				$recipient = self::get_user_email( $user_id );
+				$user = get_userdata( $user_id );
+				$recipient = self::get_user_email( $user );
 				$data = array(
 					'user_id' => $user_id,
 					'merchant_id' => $merchant_id,
